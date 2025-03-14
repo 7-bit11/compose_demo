@@ -9,11 +9,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
@@ -65,10 +69,13 @@ class MainActivity : ComponentActivity() {
                                 .fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally
 
                         ) {
-                            Image(contentScale = ContentScale.Crop,
+                            Image(
+                                contentScale = ContentScale.Crop,
                                 painter = painterResource(id = R.drawable.logo), // 从资源文件加载图片
                                 contentDescription = "My Image", // 图片描述  必须
-                                modifier = Modifier.size(150.dp).padding(top = 20.dp)
+                                modifier = Modifier
+                                    .size(150.dp)
+                                    .padding(top = 20.dp)
                                     .clip(RoundedCornerShape(2.dp))
 //                                    .border(
 //                                        width = 2.dp, // 边框宽度
@@ -77,7 +84,20 @@ class MainActivity : ComponentActivity() {
 //                                    ), // 图片占满全部空间
 //                                contentScale = ContentScale.Crop // 缩放类型：裁剪
                             )
-                            Text("")
+                            Box(modifier = Modifier.height(10.dp))
+                            Box(modifier = Modifier.padding(20.dp).clip(RoundedCornerShape(8.dp))) {
+                                Box(contentAlignment = Alignment.Center,
+                                    modifier = Modifier
+                                        .background(Color(0xffFFFFFF))
+                                        .padding(vertical = 5.dp, horizontal = 10.dp)
+                                        .height(45.dp)
+                                        .fillMaxSize()
+                                       // .clip(RoundedCornerShape(8.dp))
+                                ) {
+                                    Text("S5720-52X-SI-AC 交换机")
+                                }
+                            }
+
                         }
                     })
             }
