@@ -9,16 +9,22 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Menu
@@ -35,17 +41,39 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontStyle
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.example.myapplication.ui.theme.MyApplicationTheme
 
 class MainActivity : ComponentActivity() {
+    @Composable
+    fun ScrollColumn(innerPadding: PaddingValues, content: @Composable ColumnScope.() -> Unit) {
+        val scrollState = rememberScrollState() // 创建滚动状态
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .verticalScroll(scrollState) // 启用垂直滚动
+                .background(Color(0xFFF8FAFC))
+                .padding(innerPadding)
+                .fillMaxSize(),
+        ) {
+            content()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
+
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
@@ -53,7 +81,7 @@ class MainActivity : ComponentActivity() {
                 Scaffold(modifier = Modifier.fillMaxSize(),
                     topBar = {
                         CenterAlignedTopAppBar(
-                            modifier = Modifier.background(Color(0xFFFFFFFF)),
+                            modifier = Modifier.background(Color(0xFFF8FAFC)),
                             //shadow(
                             //elevation = 2.dp, // 阴影高度
                             //shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp) // 阴影形状
@@ -62,12 +90,8 @@ class MainActivity : ComponentActivity() {
                         )
                     },
                     content = { innerPadding ->
-                        Column(
-                            modifier = Modifier
-                                .padding(innerPadding)
-                                .background(Color(0xFFF8FAFC))
-                                .fillMaxSize(), horizontalAlignment = Alignment.CenterHorizontally
-
+                        ScrollColumn(
+                            innerPadding
                         ) {
                             Image(
                                 contentScale = ContentScale.Crop,
@@ -85,23 +109,97 @@ class MainActivity : ComponentActivity() {
 //                                contentScale = ContentScale.Crop // 缩放类型：裁剪
                             )
                             Box(modifier = Modifier.height(10.dp))
-                            Box(modifier = Modifier.padding(20.dp).clip(RoundedCornerShape(8.dp))) {
-                                Box(contentAlignment = Alignment.Center,
-                                    modifier = Modifier
-                                        .background(Color(0xffFFFFFF))
-                                        .padding(vertical = 5.dp, horizontal = 10.dp)
-                                        .height(45.dp)
-                                        .fillMaxSize()
-                                       // .clip(RoundedCornerShape(8.dp))
+                            CardBox(){
+                                Text(
+                                    text = "S5720-52X-SI-AC 交换机",
+                                    fontStyle = FontStyle.Normal,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                            CardBox(){
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceAround
                                 ) {
-                                    Text("S5720-52X-SI-AC 交换机")
+                                    Column(modifier = Modifier.fillMaxWidth(.6f)) {
+                                        getLeftBody(
+                                            title = "软件版本",
+                                            data = "V200R019C00SPC500"
+                                        )
+                                        Box(modifier = Modifier.height(10.dp))
+                                        getLeftBody(
+                                            title = "设备序列号",
+                                            data = "21023BYTH85300P8B"
+                                        )
+                                    }
+                                    Column(modifier = Modifier.fillMaxWidth(1f)) {
+                                        getLeftBody(
+                                            title = "发布日期",
+                                            data = "2023-12-15", boolean = true
+                                        )
+                                        Box(modifier = Modifier.height(10.dp))
+                                        getLeftBody(
+                                            title = "MAC地址",
+                                            data = "5C:7D:5E:8F:2A:1B", boolean = true
+                                        )
+                                    }
                                 }
                             }
-
+                            CardBox(){
+                                Row(modifier = Modifier.fillMaxWidth()) {
+                                    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+                                        Text("POE功率", fontWeight = FontWeight.Bold)
+                                        Box(modifier = Modifier.height(10.dp))
+                                        Row {
+                                            lBoxRText(color = Color(0xff2563EB), text = "总功率")
+                                            Box(modifier = Modifier.width(5.dp))
+                                            lBoxRText(color = Color(0xffFAAD14), text = "已用功率")
+                                        }
+                                    }
+                                }
+                            }
                         }
                     })
             }
         }
+    }
+}
+@Composable
+fun lBoxRText(color: Color,text:String){
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Box(modifier = Modifier.size(16.dp).clip(RoundedCornerShape(3.dp)).background(color))
+        Box(modifier = Modifier.width(2.dp))
+        Text(text, fontSize = 14.sp, color = Color(0xff6B7280))
+    }
+}
+
+@Composable
+fun CardBox( content: @Composable() (() -> Unit)){
+    Box(
+        modifier = Modifier
+            .padding(vertical = 10.dp, horizontal = 20.dp)
+            .clip(RoundedCornerShape(8.dp))
+    ) {
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .background(Color(0xffFFFFFF))
+                .padding(vertical = 15.dp, horizontal = 10.dp)
+                //.height(45.dp)
+                .fillMaxWidth()
+            // .clip(RoundedCornerShape(8.dp))
+        ) {
+            content()
+        }
+    }
+}
+
+@Composable
+fun getLeftBody(title: String, data: String, boolean: Boolean = false) {
+    var h: Alignment. Horizontal =if (boolean) Alignment.End else Alignment.Start
+    Column(horizontalAlignment = h, modifier = Modifier.padding(horizontal = 10.dp).fillMaxWidth()) {
+        Text(text = title, color = Color(0xff6B7280), fontSize = 16.sp)
+        Text(data, fontWeight = FontWeight.Bold, fontSize = 12.sp)
     }
 }
 
