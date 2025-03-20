@@ -51,10 +51,22 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.ui.theme.MyApplicationTheme
+import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.material3.Switch
+import androidx.compose.material3.SwitchColors
+import androidx.compose.material3.SwitchDefaults
+import androidx.compose.material3.TopAppBarColors
+import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.ui.graphics.drawscope.DrawScope
 
 class MainActivity : ComponentActivity() {
     @Composable
@@ -72,16 +84,26 @@ class MainActivity : ComponentActivity() {
         }
     }
 
+    //可变空列表
+    var data: MutableList<BoxAttribute> = mutableListOf()
+    var boolean: MutableState<Boolean> =mutableStateOf(false);// 使用 mutableStateOf 管理状态
     override fun onCreate(savedInstanceState: Bundle?) {
-
+        // 添加元素
+        data.add(BoxAttribute(Color(0xff22C55E), "1G/2.5G/10G"))//Color(0xff22C55E),"1G/2.5G/10G")
+        data.add(BoxAttribute(Color(0xffFAAD14), "10M/100M"))
+        data.add(BoxAttribute(Color(0xff7D8899), "未连接"))
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
             MyApplicationTheme {
                 Scaffold(modifier = Modifier.fillMaxSize(),
                     topBar = {
-                        CenterAlignedTopAppBar(
-                            modifier = Modifier.background(Color(0xFFF8FAFC)),
+                        CenterAlignedTopAppBar(colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                            containerColor = Color(0xFFF8FAFC), // 设置背景色为蓝色
+                            titleContentColor =  Color.Black, // 设置标题文本颜色为白色
+                        ),
+                        modifier = Modifier.background(Color(0xFFF8FAFC)),
+
                             //shadow(
                             //elevation = 2.dp, // 阴影高度
                             //shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp) // 阴影形状
@@ -109,14 +131,14 @@ class MainActivity : ComponentActivity() {
 //                                contentScale = ContentScale.Crop // 缩放类型：裁剪
                             )
                             Box(modifier = Modifier.height(10.dp))
-                            CardBox(){
+                            CardBox() {
                                 Text(
                                     text = "S5720-52X-SI-AC 交换机",
                                     fontStyle = FontStyle.Normal,
                                     fontWeight = FontWeight.Bold
                                 )
                             }
-                            CardBox(){
+                            CardBox() {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
                                     horizontalArrangement = Arrangement.SpaceAround
@@ -145,8 +167,11 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             }
-                            CardBox(){
-                                Row(modifier = Modifier.fillMaxWidth()) {
+                            CardBox() {
+                                Row(
+                                    modifier = Modifier.fillMaxWidth(),
+                                    horizontalArrangement = Arrangement.SpaceBetween
+                                ) {
                                     Column(modifier = Modifier.padding(horizontal = 16.dp)) {
                                         Text("POE功率", fontWeight = FontWeight.Bold)
                                         Box(modifier = Modifier.height(10.dp))
@@ -156,25 +181,108 @@ class MainActivity : ComponentActivity() {
                                             lBoxRText(color = Color(0xffFAAD14), text = "已用功率")
                                         }
                                     }
+                                    Column(
+                                        modifier = Modifier.padding(end = 10.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        PieChart(
+                                            totalProgress = 1f,        // 总进度 100%
+                                            usedProgress = 0.35f,      // 使用进度 65%
+                                            totalColor = Color(0xff2563EB),
+                                            usedColor = Color(0xffFAAD14),
+                                            size = 40.dp
+                                        )
+                                        Text("100W/35W", fontSize = 12.sp)
+                                    }
                                 }
                             }
+                            CardBox {
+                                Column {
+                                    Text("端口信息", fontWeight = FontWeight.Bold, fontSize = 18.sp)
+                                    Box(modifier = Modifier.height(10.dp))
+                                    LazyRow() {
+                                        items(count = 24) { index ->
+
+                                            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                                Box(
+                                                    modifier = Modifier
+                                                        .padding(horizontal = 5.dp)
+                                                        .size(30.dp)
+                                                        .clip(RoundedCornerShape(3.dp))
+                                                        .background(
+                                                            if (index % 5 == 0) Color(0xff22C55E) else Color(
+                                                                0xffD8D8D8
+                                                            )
+                                                        )
+                                                )
+                                                Text((index + 1).toString())
+                                            }
+                                        }
+                                    }
+                                    Box(modifier = Modifier.height(10.dp))
+                                    LazyRow() {
+                                        items(count = data.size) { index ->
+                                            Box(modifier = Modifier.padding(horizontal = 5.dp)) {
+                                                lBoxRText(
+                                                    data[index].color,
+                                                    data[index].text
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                            CardSwitch(boolean = boolean.value, text = "环路保护", onCheckedChange = {bool->
+                                boolean.value=bool;
+                            },)
+                            CardSwitch(boolean = boolean.value, text = "VLAN一键隔离", onCheckedChange = {bool->
+                                boolean.value=bool;
+                            },)
+                            Box(Modifier.height(100.dp))
                         }
                     })
             }
         }
     }
 }
+
 @Composable
-fun lBoxRText(color: Color,text:String){
+fun CardSwitch(
+    boolean: Boolean,
+    text: String = "",
+    modifier: Modifier = Modifier,
+    onCheckedChange: ((Boolean) -> Unit)?
+) {
+    CardBox {
+        Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically,modifier=modifier.fillMaxWidth()) {
+            Text(text, fontSize = 18.sp, color = Color(0xff7D8899))
+            Switch(boolean, onCheckedChange = onCheckedChange, colors =  SwitchDefaults.colors(
+                checkedThumbColor =Color.White , // 开启时滑块颜色
+                uncheckedThumbColor = Color.White, // 关闭时滑块颜色
+                checkedTrackColor = Color(0xff3F7EFA), // 开启时轨道颜色
+                uncheckedTrackColor = Color(0xffD8D8D8) ,// 关闭时轨道颜色
+                uncheckedBorderColor = Color.Transparent
+            ))
+        }
+    }
+}
+
+@Composable
+fun lBoxRText(color: Color, text: String, modifier: Modifier = Modifier) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Box(modifier = Modifier.size(16.dp).clip(RoundedCornerShape(3.dp)).background(color))
+        Box(
+            modifier = Modifier
+                .size(16.dp)
+                .clip(RoundedCornerShape(3.dp))
+                .background(color)
+        )
         Box(modifier = Modifier.width(2.dp))
         Text(text, fontSize = 14.sp, color = Color(0xff6B7280))
     }
 }
 
 @Composable
-fun CardBox( content: @Composable() (() -> Unit)){
+fun CardBox(content: @Composable() (() -> Unit)) {
     Box(
         modifier = Modifier
             .padding(vertical = 10.dp, horizontal = 20.dp)
@@ -196,8 +304,13 @@ fun CardBox( content: @Composable() (() -> Unit)){
 
 @Composable
 fun getLeftBody(title: String, data: String, boolean: Boolean = false) {
-    var h: Alignment. Horizontal =if (boolean) Alignment.End else Alignment.Start
-    Column(horizontalAlignment = h, modifier = Modifier.padding(horizontal = 10.dp).fillMaxWidth()) {
+    var h: Alignment.Horizontal = if (boolean) Alignment.End else Alignment.Start
+    Column(
+        horizontalAlignment = h,
+        modifier = Modifier
+            .padding(horizontal = 10.dp)
+            .fillMaxWidth()
+    ) {
         Text(text = title, color = Color(0xff6B7280), fontSize = 16.sp)
         Text(data, fontWeight = FontWeight.Bold, fontSize = 12.sp)
     }
@@ -248,4 +361,49 @@ fun MyTopAppBar() {
 //            navigationIconContentColor = OrangeA700		// 导航图标内容颜色
         )
     )
+}
+
+@Composable
+fun PieChart(
+    totalProgress: Float, // 总进度 (0..1)
+    usedProgress: Float,   // 使用进度 (0..1)
+    totalColor: Color,     // 总进度颜色
+    usedColor: Color,      // 使用进度颜色
+    size: Dp = 100.dp      // 饼状图大小
+) {
+    // 确保进度在 0 到 1 之间
+    val clampedTotalProgress = totalProgress.coerceIn(0f, 1f)
+    val clampedUsedProgress = usedProgress.coerceIn(0f, clampedTotalProgress)
+
+    Canvas(modifier = Modifier.size(size)) {
+        // 绘制总进度
+        drawPieChart(clampedTotalProgress, totalColor)
+        // 绘制使用进度
+        drawPieChart(clampedUsedProgress, usedColor)
+    }
+}
+
+private fun DrawScope.drawPieChart(
+    progress: Float,
+    color: Color
+) {
+    val sweepAngle = 360 * progress
+    drawArc(
+        color = color,
+        startAngle = -90f, // 从12点方向开始
+        sweepAngle = sweepAngle,
+        useCenter = true
+    )
+}
+
+class BoxAttribute {
+    val color: Color
+    val text: String
+
+    // 主构造函数
+    constructor(color: Color, text: String) {
+        this.color = color
+        this.text = text
+    }
+
 }
