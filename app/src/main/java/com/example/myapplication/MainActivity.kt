@@ -86,7 +86,8 @@ class MainActivity : ComponentActivity() {
 
     //可变空列表
     var data: MutableList<BoxAttribute> = mutableListOf()
-    var boolean: MutableState<Boolean> =mutableStateOf(false);// 使用 mutableStateOf 管理状态
+    var hl: MutableState<Boolean> =mutableStateOf(false);// 使用 mutableStateOf 管理状态
+    var vlan: MutableState<Boolean> =mutableStateOf(false);// 使用 mutableStateOf 管理状态
     override fun onCreate(savedInstanceState: Bundle?) {
         // 添加元素
         data.add(BoxAttribute(Color(0xff22C55E), "1G/2.5G/10G"))//Color(0xff22C55E),"1G/2.5G/10G")
@@ -232,11 +233,11 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             }
-                            CardSwitch(boolean = boolean.value, text = "环路保护", onCheckedChange = {bool->
-                                boolean.value=bool;
+                            CardSwitch(boolean = hl.value, text = "环路保护", onCheckedChange = {bool->
+                                hl.value=bool;
                             },)
-                            CardSwitch(boolean = boolean.value, text = "VLAN一键隔离", onCheckedChange = {bool->
-                                boolean.value=bool;
+                            CardSwitch(boolean = vlan.value, text = "VLAN一键隔离", onCheckedChange = {bool->
+                                vlan.value=bool;
                             },)
                             Box(Modifier.height(100.dp))
                         }
