@@ -2,10 +2,12 @@
 
 package com.example.myapplication
 
+import android.annotation.SuppressLint
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -57,15 +59,21 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.myapplication.ui.theme.MyApplicationTheme
 import androidx.compose.foundation.Canvas
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.indication
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchColors
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.TopAppBarColors
 import androidx.compose.runtime.MutableState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.drawscope.DrawScope
 
 class MainActivity : ComponentActivity() {
@@ -86,8 +94,10 @@ class MainActivity : ComponentActivity() {
 
     //可变空列表
     var data: MutableList<BoxAttribute> = mutableListOf()
-    var hl: MutableState<Boolean> =mutableStateOf(false);// 使用 mutableStateOf 管理状态
-    var vlan: MutableState<Boolean> =mutableStateOf(false);// 使用 mutableStateOf 管理状态
+    var hl: MutableState<Boolean> = mutableStateOf(false);// 使用 mutableStateOf 管理状态
+    var vlan: MutableState<Boolean> = mutableStateOf(false);// 使用 mutableStateOf 管理状态
+
+    @SuppressLint("UnrememberedMutableInteractionSource")
     override fun onCreate(savedInstanceState: Bundle?) {
         // 添加元素
         data.add(BoxAttribute(Color(0xff22C55E), "1G/2.5G/10G"))//Color(0xff22C55E),"1G/2.5G/10G")
@@ -99,11 +109,12 @@ class MainActivity : ComponentActivity() {
             MyApplicationTheme {
                 Scaffold(modifier = Modifier.fillMaxSize(),
                     topBar = {
-                        CenterAlignedTopAppBar(colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
-                            containerColor = Color(0xFFF8FAFC), // 设置背景色为蓝色
-                            titleContentColor =  Color.Black, // 设置标题文本颜色为白色
-                        ),
-                        modifier = Modifier.background(Color(0xFFF8FAFC)),
+                        CenterAlignedTopAppBar(
+                            colors = TopAppBarDefaults.centerAlignedTopAppBarColors(
+                                containerColor = Color(0xFFF8FAFC), // 设置背景色为蓝色
+                                titleContentColor = Color.Black, // 设置标题文本颜色为白色
+                            ),
+                            modifier = Modifier.background(Color(0xFFF8FAFC)),
 
                             //shadow(
                             //elevation = 2.dp, // 阴影高度
@@ -131,12 +142,23 @@ class MainActivity : ComponentActivity() {
 //                                    ), // 图片占满全部空间
 //                                contentScale = ContentScale.Crop // 缩放类型：裁剪
                             )
+                            var abb by remember { mutableStateOf(false) }
+                            val abbColor: Color by animateColorAsState(
+                                if (abb) Color.Red else Color.Blue
+                            )
                             Box(modifier = Modifier.height(10.dp))
-                            CardBox() {
+                            CardBox(modifier = Modifier.clickable(
+                                MutableInteractionSource(),
+                                indication = null) // 禁用点击效果
+
+                            {
+                                abb = !abb;
+                            }) {
                                 Text(
                                     text = "S5720-52X-SI-AC 交换机",
                                     fontStyle = FontStyle.Normal,
-                                    fontWeight = FontWeight.Bold
+                                    fontWeight = FontWeight.Bold,
+                                    color = abbColor
                                 )
                             }
                             CardBox() {
@@ -233,12 +255,18 @@ class MainActivity : ComponentActivity() {
                                     }
                                 }
                             }
-                            CardSwitch(boolean = hl.value, text = "环路保护", onCheckedChange = {bool->
-                                hl.value=bool;
-                            },)
-                            CardSwitch(boolean = vlan.value, text = "VLAN一键隔离", onCheckedChange = {bool->
-                                vlan.value=bool;
-                            },)
+                            CardSwitch(
+                                boolean = hl.value, text = "环路保护",
+                                onCheckedChange = { bool ->
+                                    hl.value = bool;
+                                },
+                            )
+                            CardSwitch(
+                                boolean = vlan.value, text = "VLAN一键隔离",
+                                onCheckedChange = { bool ->
+                                    vlan.value = bool;
+                                },
+                            )
                             Box(Modifier.height(100.dp))
                         }
                     })
@@ -255,15 +283,21 @@ fun CardSwitch(
     onCheckedChange: ((Boolean) -> Unit)?
 ) {
     CardBox {
-        Row(horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically,modifier=modifier.fillMaxWidth()) {
+        Row(
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically,
+            modifier = modifier.fillMaxWidth()
+        ) {
             Text(text, fontSize = 18.sp, color = Color(0xff7D8899))
-            Switch(boolean, onCheckedChange = onCheckedChange, colors =  SwitchDefaults.colors(
-                checkedThumbColor =Color.White , // 开启时滑块颜色
-                uncheckedThumbColor = Color.White, // 关闭时滑块颜色
-                checkedTrackColor = Color(0xff3F7EFA), // 开启时轨道颜色
-                uncheckedTrackColor = Color(0xffD8D8D8) ,// 关闭时轨道颜色
-                uncheckedBorderColor = Color.Transparent
-            ))
+            Switch(
+                boolean, onCheckedChange = onCheckedChange, colors = SwitchDefaults.colors(
+                    checkedThumbColor = Color.White, // 开启时滑块颜色
+                    uncheckedThumbColor = Color.White, // 关闭时滑块颜色
+                    checkedTrackColor = Color(0xff3F7EFA), // 开启时轨道颜色
+                    uncheckedTrackColor = Color(0xffD8D8D8),// 关闭时轨道颜色
+                    uncheckedBorderColor = Color.Transparent
+                )
+            )
         }
     }
 }
@@ -283,9 +317,9 @@ fun lBoxRText(color: Color, text: String, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun CardBox(content: @Composable() (() -> Unit)) {
+fun CardBox(modifier: Modifier = Modifier, content: @Composable() (() -> Unit)) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .padding(vertical = 10.dp, horizontal = 20.dp)
             .clip(RoundedCornerShape(8.dp))
     ) {
