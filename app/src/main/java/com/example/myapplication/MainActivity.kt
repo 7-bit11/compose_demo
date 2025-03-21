@@ -63,7 +63,10 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchColors
@@ -149,11 +152,9 @@ class MainActivity : ComponentActivity() {
                             Box(modifier = Modifier.height(10.dp))
                             CardBox(modifier = Modifier.clickable(
                                 MutableInteractionSource(),
-                                indication = null) // 禁用点击效果
-
-                            {
-                                abb = !abb;
-                            }) {
+                                indication = null
+                            ) // 禁用点击效果
+                            { abb = !abb }) {
                                 Text(
                                     text = "S5720-52X-SI-AC 交换机",
                                     fontStyle = FontStyle.Normal,
@@ -267,8 +268,31 @@ class MainActivity : ComponentActivity() {
                                     vlan.value = bool;
                                 },
                             )
+                            CardBox (modifier = Modifier.heightIn(max = 300.dp)){
+                                LazyVerticalGrid(
+                                    columns = GridCells.Fixed(4), // 每列最小宽度为 128.dp
+                                ) {
+                                    items(8) { item ->
+                                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(vertical = 3.dp)) {
+                                            Image(
+                                                contentScale = ContentScale.Crop,
+                                                painter = painterResource(id = R.drawable.logo), // 从资源文件加载图片
+                                                contentDescription = "My Image", // 图片描述  必须
+                                                modifier = Modifier
+                                                    .size(40.dp)
+                                                    .clip(RoundedCornerShape(2.dp))
+                                            )
+                                            Text("icon:$item")
+                                        }
+                                    }
+                                }
+
+                            }
+
                             Box(Modifier.height(100.dp))
                         }
+
+
                     })
             }
         }
