@@ -99,6 +99,14 @@ class MainActivity : ComponentActivity() {
     var data: MutableList<BoxAttribute> = mutableListOf()
     var hl: MutableState<Boolean> = mutableStateOf(false);// 使用 mutableStateOf 管理状态
     var vlan: MutableState<Boolean> = mutableStateOf(false);// 使用 mutableStateOf 管理状态
+    var items: MutableList<ItemAttribute> = mutableListOf(
+        ItemAttribute(R.drawable.svg1, "修改设备"),
+        ItemAttribute(R.drawable.svg3, "端口信息"),
+        ItemAttribute(R.drawable.svg2, "VLAN列表"),
+        ItemAttribute(R.drawable.svg5, "PVID"),
+        ItemAttribute(R.drawable.svg4, "风暴抑制"),
+        ItemAttribute(R.drawable.loop, "OTA升级"),
+    );
 
     @SuppressLint("UnrememberedMutableInteractionSource")
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -268,27 +276,37 @@ class MainActivity : ComponentActivity() {
                                     vlan.value = bool;
                                 },
                             )
-                            CardBox (modifier = Modifier.heightIn(max = 300.dp)){
+//                            CardBox(modifier = Modifier.heightIn(max = 300.dp)) {
+//
+//
+//                            }
+                            Box(modifier = Modifier.heightIn(max = 300.dp).padding(horizontal = 15.dp, vertical = 10.dp)){
                                 LazyVerticalGrid(
                                     columns = GridCells.Fixed(4), // 每列最小宽度为 128.dp
                                 ) {
-                                    items(8) { item ->
-                                        Column(horizontalAlignment = Alignment.CenterHorizontally, modifier = Modifier.padding(vertical = 3.dp)) {
-                                            Image(
-                                                contentScale = ContentScale.Crop,
-                                                painter = painterResource(id = R.drawable.logo), // 从资源文件加载图片
-                                                contentDescription = "My Image", // 图片描述  必须
-                                                modifier = Modifier
-                                                    .size(40.dp)
-                                                    .clip(RoundedCornerShape(2.dp))
-                                            )
-                                            Text("icon:$item")
-                                        }
+                                    items(items.size) { item ->
+                                       Box(modifier = Modifier.padding(10.dp).clip(
+                                           RoundedCornerShape(5.dp)
+                                       ).background(color = Color.White)){
+                                           Column(
+                                               horizontalAlignment = Alignment.CenterHorizontally,
+                                               modifier = Modifier.padding(5.dp).fillMaxWidth(), verticalArrangement = Arrangement.Center
+                                           ) {
+                                               Box(Modifier.height(5.dp))
+                                               Image(
+                                                   contentScale = ContentScale.Crop,
+                                                   painter = painterResource(id =items[item].id ), // 从资源文件加载图片
+                                                   contentDescription = items[item].str, // 图片描述  必须
+                                                   modifier = Modifier
+                                                       .size(16.dp)
+                                                       .clip(RoundedCornerShape(2.dp))
+                                               )
+                                               Text(items[item].str, fontSize = 12.sp, fontWeight = FontWeight.Bold)
+                                           }
+                                       }
                                     }
                                 }
-
                             }
-
                             Box(Modifier.height(100.dp))
                         }
 
@@ -465,4 +483,14 @@ class BoxAttribute {
         this.text = text
     }
 
+}
+
+class ItemAttribute {
+    val id: Int;
+    val str: String;
+
+    constructor(id: Int, str: String) {
+        this.id = id;
+        this.str = str;
+    }
 }
