@@ -64,6 +64,7 @@ import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -78,6 +79,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 
 class MainActivity : ComponentActivity() {
     @Composable
@@ -107,10 +110,29 @@ class MainActivity : ComponentActivity() {
         ItemAttribute(R.drawable.svg4, "风暴抑制"),
         ItemAttribute(R.drawable.loop, "OTA升级"),
     );
+    var tableData = mutableListOf(
+        TableRow(1, "Alice", mutableStateOf(23), "New York"),
+        TableRow(2, "Bob", mutableStateOf(23), "San Francisco"),
+        TableRow(3, "Charlie", mutableStateOf(23), "Los Angeles"),
+        TableRow(4, "Diana", mutableStateOf(23), "Chicago"),
+        TableRow(3, "Charlie", mutableStateOf(23), "Los Angeles"),
+        TableRow(4, "Diana", mutableStateOf(23), "Chicago"),
+        TableRow(3, "Charlie", mutableStateOf(23), "Los Angeles"),
+        TableRow(4, "Diana", mutableStateOf(23), "Chicago"),
+        TableRow(3, "Charlie", mutableStateOf(23), "Los Angeles"),
+        TableRow(4, "Diana", mutableStateOf(23), "Chicago"),
+        TableRow(3, "Charlie", mutableStateOf(23), "Los Angeles"),
+        TableRow(4, "Diana", mutableStateOf(23), "Chicago"),
+        TableRow(3, "Charlie", mutableStateOf(23), "Los Angeles"),
+        TableRow(4, "Diana", mutableStateOf(23), "Chicago"),
+        TableRow(3, "Charlie", mutableStateOf(23), "Los Angeles"),
+        TableRow(4, "Diana", mutableStateOf(23), "Chicago")
+    )
 
     @SuppressLint("UnrememberedMutableInteractionSource")
     override fun onCreate(savedInstanceState: Bundle?) {
         // 添加元素
+
         data.add(BoxAttribute(Color(0xff22C55E), "1G/2.5G/10G"))//Color(0xff22C55E),"1G/2.5G/10G")
         data.add(BoxAttribute(Color(0xffFAAD14), "10M/100M"))
         data.add(BoxAttribute(Color(0xff7D8899), "未连接"))
@@ -126,7 +148,6 @@ class MainActivity : ComponentActivity() {
                                 titleContentColor = Color.Black, // 设置标题文本颜色为白色
                             ),
                             modifier = Modifier.background(Color(0xFFF8FAFC)),
-
                             //shadow(
                             //elevation = 2.dp, // 阴影高度
                             //shape = RoundedCornerShape(bottomStart = 8.dp, bottomEnd = 8.dp) // 阴影形状
@@ -280,37 +301,124 @@ class MainActivity : ComponentActivity() {
 //
 //
 //                            }
-                            Box(modifier = Modifier.heightIn(max = 300.dp).padding(horizontal = 15.dp, vertical = 10.dp)){
+                            Box(
+                                modifier = Modifier
+                                    .heightIn(max = 300.dp)
+                                    .padding(horizontal = 15.dp, vertical = 10.dp)
+                            ) {
                                 LazyVerticalGrid(
                                     columns = GridCells.Fixed(4), // 每列最小宽度为 128.dp
                                 ) {
                                     items(items.size) { item ->
-                                       Box(modifier = Modifier.padding(10.dp).clip(
-                                           RoundedCornerShape(5.dp)
-                                       ).background(color = Color.White)){
-                                           Column(
-                                               horizontalAlignment = Alignment.CenterHorizontally,
-                                               modifier = Modifier.padding(5.dp).fillMaxWidth(), verticalArrangement = Arrangement.Center
-                                           ) {
-                                               Box(Modifier.height(5.dp))
-                                               Image(
-                                                   contentScale = ContentScale.Crop,
-                                                   painter = painterResource(id =items[item].id ), // 从资源文件加载图片
-                                                   contentDescription = items[item].str, // 图片描述  必须
-                                                   modifier = Modifier
-                                                       .size(16.dp)
-                                                       .clip(RoundedCornerShape(2.dp))
-                                               )
-                                               Text(items[item].str, fontSize = 12.sp, fontWeight = FontWeight.Bold)
-                                           }
-                                       }
+                                        Box(
+                                            modifier = Modifier
+                                                .padding(10.dp)
+                                                .clip(
+                                                    RoundedCornerShape(5.dp)
+                                                )
+                                                .background(color = Color.White)
+                                        ) {
+                                            Column(
+                                                horizontalAlignment = Alignment.CenterHorizontally,
+                                                modifier = Modifier
+                                                    .padding(5.dp)
+                                                    .fillMaxWidth(),
+                                                verticalArrangement = Arrangement.Center
+                                            ) {
+                                                Box(Modifier.height(5.dp))
+                                                Image(
+                                                    contentScale = ContentScale.Crop,
+                                                    painter = painterResource(id = items[item].id), // 从资源文件加载图片
+                                                    contentDescription = items[item].str, // 图片描述  必须
+                                                    modifier = Modifier
+                                                        .size(16.dp)
+                                                        .clip(RoundedCornerShape(2.dp))
+                                                )
+                                                Text(
+                                                    items[item].str,
+                                                    fontSize = 12.sp,
+                                                    fontWeight = FontWeight.Bold
+                                                )
+                                            }
+                                        }
                                     }
                                 }
                             }
-                            Box(Modifier.height(100.dp))
+                            CardBox(Modifier.heightIn(max = 500.dp)) {
+                                LazyColumn(modifier = Modifier.padding(16.dp)) {
+                                    // Table Header
+                                    item {
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = 8.dp),
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            Text(
+                                                "端口",
+                                                modifier = Modifier.weight(1f),
+                                                textAlign = TextAlign.Center,
+                                                fontSize = 16.sp
+                                            )
+                                            Text(
+                                                "状态",
+                                                modifier = Modifier.weight(2f),
+                                                textAlign = TextAlign.Center,
+                                                fontSize = 16.sp
+                                            )
+                                            Text(
+                                                "POE开关",
+                                                modifier = Modifier.weight(2f),
+                                                textAlign = TextAlign.Center,
+                                                fontSize = 16.sp
+                                            )
+                                            Text(
+                                                "功率",
+                                                modifier = Modifier.weight(3f),
+                                                textAlign = TextAlign.Center,
+                                                fontSize = 16.sp
+                                            )
+                                        }
+                                    }
+
+                                    // Table Rows
+                                    items(tableData.size) { row ->
+                                        Row(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = 8.dp)
+                                                .clickable {
+                                                    tableData[row].age.value+=2;
+                                                },
+                                            horizontalArrangement = Arrangement.SpaceBetween
+                                        ) {
+                                            Text(
+                                                row.toString(),
+                                                modifier = Modifier.weight(1f),
+                                                textAlign = TextAlign.Center
+                                            )
+                                            Text(
+                                                tableData[row].name,
+                                                modifier = Modifier.weight(2f),
+                                                textAlign = TextAlign.Center
+                                            )
+                                            Text(
+                                                tableData[row].age.value.toString(),
+                                                modifier = Modifier.weight(2f),
+                                                textAlign = TextAlign.Center
+                                            )
+                                            Text(
+                                                tableData[row].city,
+                                                modifier = Modifier.weight(3f),
+                                                textAlign = TextAlign.Center, maxLines = 1, overflow = TextOverflow.Ellipsis
+                                            )
+                                        }
+                                    }
+                                }
+                                Box(Modifier.height(100.dp))
+                            }
+
                         }
-
-
                     })
             }
         }
@@ -494,3 +602,5 @@ class ItemAttribute {
         this.str = str;
     }
 }
+
+data class TableRow(val id: Int, val name: String, var age: MutableState<Int>, val city: String)
