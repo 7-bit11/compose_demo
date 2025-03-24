@@ -78,6 +78,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -111,22 +112,22 @@ class MainActivity : ComponentActivity() {
         ItemAttribute(R.drawable.loop, "OTA升级"),
     );
     var tableData = mutableListOf(
-        TableRow(1, "Alice", mutableStateOf(23), "New York"),
-        TableRow(2, "Bob", mutableStateOf(23), "San Francisco"),
-        TableRow(3, "Charlie", mutableStateOf(23), "Los Angeles"),
-        TableRow(4, "Diana", mutableStateOf(23), "Chicago"),
-        TableRow(3, "Charlie", mutableStateOf(23), "Los Angeles"),
-        TableRow(4, "Diana", mutableStateOf(23), "Chicago"),
-        TableRow(3, "Charlie", mutableStateOf(23), "Los Angeles"),
-        TableRow(4, "Diana", mutableStateOf(23), "Chicago"),
-        TableRow(3, "Charlie", mutableStateOf(23), "Los Angeles"),
-        TableRow(4, "Diana", mutableStateOf(23), "Chicago"),
-        TableRow(3, "Charlie", mutableStateOf(23), "Los Angeles"),
-        TableRow(4, "Diana", mutableStateOf(23), "Chicago"),
-        TableRow(3, "Charlie", mutableStateOf(23), "Los Angeles"),
-        TableRow(4, "Diana", mutableStateOf(23), "Chicago"),
-        TableRow(3, "Charlie", mutableStateOf(23), "Los Angeles"),
-        TableRow(4, "Diana", mutableStateOf(23), "Chicago")
+        TableRow(1, "Alice", mutableStateOf(false), "New York"),
+        TableRow(2, "Bob", mutableStateOf(false), "San Francisco"),
+        TableRow(3, "Charlie", mutableStateOf(false), "Los Angeles"),
+        TableRow(4, "Diana", mutableStateOf(false), "Chicago"),
+        TableRow(3, "Charlie", mutableStateOf(false), "Los Angeles"),
+        TableRow(4, "Diana", mutableStateOf(false), "Chicago"),
+        TableRow(3, "Charlie", mutableStateOf(false), "Los Angeles"),
+        TableRow(4, "Diana", mutableStateOf(false), "Chicago"),
+        TableRow(3, "Charlie", mutableStateOf(false), "Los Angeles"),
+        TableRow(4, "Diana", mutableStateOf(false), "Chicago"),
+        TableRow(3, "Charlie", mutableStateOf(false), "Los Angeles"),
+        TableRow(4, "Diana", mutableStateOf(false), "Chicago"),
+        TableRow(3, "Charlie", mutableStateOf(false), "Los Angeles"),
+        TableRow(4, "Diana", mutableStateOf(false), "Chicago"),
+        TableRow(3, "Charlie", mutableStateOf(false), "Los Angeles"),
+        TableRow(4, "Diana", mutableStateOf(false), "Chicago")
     )
 
     @SuppressLint("UnrememberedMutableInteractionSource")
@@ -387,9 +388,7 @@ class MainActivity : ComponentActivity() {
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .padding(vertical = 8.dp)
-                                                .clickable {
-                                                    tableData[row].age.value+=2;
-                                                },
+                                               , verticalAlignment = Alignment.CenterVertically,
                                             horizontalArrangement = Arrangement.SpaceBetween
                                         ) {
                                             Text(
@@ -402,10 +401,16 @@ class MainActivity : ComponentActivity() {
                                                 modifier = Modifier.weight(2f),
                                                 textAlign = TextAlign.Center
                                             )
-                                            Text(
-                                                tableData[row].age.value.toString(),
-                                                modifier = Modifier.weight(2f),
-                                                textAlign = TextAlign.Center
+                                            Switch(
+                                                tableData[row].age.value, onCheckedChange = {
+                                                    tableData[row].age.value=!tableData[row].age.value;
+                                                }, colors = SwitchDefaults.colors(
+                                                    checkedThumbColor = Color.White, // 开启时滑块颜色
+                                                    uncheckedThumbColor = Color.White, // 关闭时滑块颜色
+                                                    checkedTrackColor = Color(0xff3F7EFA), // 开启时轨道颜色
+                                                    uncheckedTrackColor = Color(0xffD8D8D8),// 关闭时轨道颜色
+                                                    uncheckedBorderColor = Color.Transparent
+                                                ),modifier = Modifier.scale(0.8f)
                                             )
                                             Text(
                                                 tableData[row].city,
@@ -603,4 +608,4 @@ class ItemAttribute {
     }
 }
 
-data class TableRow(val id: Int, val name: String, var age: MutableState<Int>, val city: String)
+data class TableRow(val id: Int, val name: String, var age: MutableState<Boolean>, val city: String)
