@@ -8,6 +8,10 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.FastOutLinearInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -68,6 +72,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.magnifier
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchColors
@@ -80,8 +85,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.layout.LayoutModifier
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.offset
+import androidx.lifecycle.LiveData
 
 class MainActivity : ComponentActivity() {
     @Composable
@@ -130,17 +139,20 @@ class MainActivity : ComponentActivity() {
         TableRow(4, "Diana", mutableStateOf(false), "Chicago")
     )
 
+    var fd: MutableState<Float> = mutableStateOf(1f);
+
     @SuppressLint("UnrememberedMutableInteractionSource")
     override fun onCreate(savedInstanceState: Bundle?) {
         // 添加元素
-
         data.add(BoxAttribute(Color(0xff22C55E), "1G/2.5G/10G"))//Color(0xff22C55E),"1G/2.5G/10G")
         data.add(BoxAttribute(Color(0xffFAAD14), "10M/100M"))
         data.add(BoxAttribute(Color(0xff7D8899), "未连接"))
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
+
         setContent {
             MyApplicationTheme {
+
                 Scaffold(modifier = Modifier.fillMaxSize(),
                     topBar = {
                         CenterAlignedTopAppBar(
@@ -160,6 +172,11 @@ class MainActivity : ComponentActivity() {
                         ScrollColumn(
                             innerPadding
                         ) {
+                            val scale by animateFloatAsState(
+                                targetValue = fd.value,
+                                animationSpec =
+                                tween(durationMillis = 500, easing = LinearEasing)
+                            )
                             Image(
                                 contentScale = ContentScale.Crop,
                                 painter = painterResource(id = R.drawable.logo), // 从资源文件加载图片
@@ -168,6 +185,8 @@ class MainActivity : ComponentActivity() {
                                     .size(150.dp)
                                     .padding(top = 20.dp)
                                     .clip(RoundedCornerShape(2.dp))
+                                    .scale(scale)
+                                    .clickable { fd.value += 1F }
 //                                    .border(
 //                                        width = 2.dp, // 边框宽度
 //                                        color = Color.Blue, // 边框颜色
@@ -179,6 +198,7 @@ class MainActivity : ComponentActivity() {
                             val abbColor: Color by animateColorAsState(
                                 if (abb) Color.Red else Color.Blue
                             )
+
                             Box(modifier = Modifier.height(10.dp))
                             CardBox(modifier = Modifier.clickable(
                                 MutableInteractionSource(),
@@ -306,6 +326,7 @@ class MainActivity : ComponentActivity() {
                                 modifier = Modifier
                                     .heightIn(max = 300.dp)
                                     .padding(horizontal = 15.dp, vertical = 10.dp)
+
                             ) {
                                 LazyVerticalGrid(
                                     columns = GridCells.Fixed(4), // 每列最小宽度为 128.dp
@@ -387,8 +408,8 @@ class MainActivity : ComponentActivity() {
                                         Row(
                                             modifier = Modifier
                                                 .fillMaxWidth()
-                                                .padding(vertical = 8.dp)
-                                               , verticalAlignment = Alignment.CenterVertically,
+                                                .padding(vertical = 8.dp),
+                                            verticalAlignment = Alignment.CenterVertically,
                                             horizontalArrangement = Arrangement.SpaceBetween
                                         ) {
                                             Text(
@@ -403,19 +424,22 @@ class MainActivity : ComponentActivity() {
                                             )
                                             Switch(
                                                 tableData[row].age.value, onCheckedChange = {
-                                                    tableData[row].age.value=!tableData[row].age.value;
+                                                    tableData[row].age.value =
+                                                        !tableData[row].age.value;
                                                 }, colors = SwitchDefaults.colors(
                                                     checkedThumbColor = Color.White, // 开启时滑块颜色
                                                     uncheckedThumbColor = Color.White, // 关闭时滑块颜色
                                                     checkedTrackColor = Color(0xff3F7EFA), // 开启时轨道颜色
                                                     uncheckedTrackColor = Color(0xffD8D8D8),// 关闭时轨道颜色
                                                     uncheckedBorderColor = Color.Transparent
-                                                ),modifier = Modifier.scale(0.8f)
+                                                ), modifier = Modifier.scale(0.8f)
                                             )
                                             Text(
                                                 tableData[row].city,
                                                 modifier = Modifier.weight(3f),
-                                                textAlign = TextAlign.Center, maxLines = 1, overflow = TextOverflow.Ellipsis
+                                                textAlign = TextAlign.Center,
+                                                maxLines = 1,
+                                                overflow = TextOverflow.Ellipsis
                                             )
                                         }
                                     }
@@ -609,3 +633,42 @@ class ItemAttribute {
 }
 
 data class TableRow(val id: Int, val name: String, var age: MutableState<Boolean>, val city: String)
+
+///自定义修饰
+fun Modifier.margin(
+    start: Dp = 0.dp,
+    top: Dp = 0.dp,
+    end: Dp = 0.dp,
+    bottom: Dp = 0.dp
+) = this.then(
+    layout { measurable, constraints ->
+        val startP=start.roundToPx();
+        val topP=top.roundToPx();
+        val endP=end.roundToPx();
+        val bottomP=bottom.roundToPx();
+        val placeable=measurable.measure(constraints.offset(horizontal = -(startP+endP), vertical = -(topP+bottomP)))
+        layout(width =  placeable.width + startP + endP, height = placeable.height+topP+bottomP){
+            placeable.place(startP,topP)
+        };
+    }
+);
+fun Modifier.margin(all: Dp) = this.then(
+    layout { measurable, constraints ->
+        val horizontal = all.roundToPx()
+        val vertical = all.roundToPx()
+
+        val placeable = measurable.measure(
+            constraints.offset(
+                horizontal = -horizontal * 2,
+                vertical = -vertical * 2
+            )
+        )
+
+        layout(
+            placeable.width + horizontal * 2,
+            placeable.height + vertical * 2
+        ) {
+            placeable.place(horizontal, vertical)
+        }
+    }
+)
