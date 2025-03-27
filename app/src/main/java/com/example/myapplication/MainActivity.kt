@@ -57,10 +57,18 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.ButtonElevation
 import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -94,7 +102,8 @@ fun ScrollColumn(
             .background(backgroundColor)
             .padding(innerPadding)
             .fillMaxSize()
-            .padding(horizontal = horizontal),
+            .padding(horizontal = horizontal)
+            .imePadding()  // 关键：避开键盘,
     ) {
         content()
     }
@@ -477,31 +486,36 @@ fun login() {
         fontWeight = FontWeight.Bold
     )
 
-    OutlinedTextField(
-        value = textState.value,
-        onValueChange = { textState.value = it },
-        //label = { Text("密码") },
-        placeholder = { Text("") },
-        modifier = Modifier
-            .padding(horizontal = 20.dp, vertical = 30.dp)
-            .fillMaxWidth(),
-        shape = RoundedCornerShape(12.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedTextColor = Color.Black,          // 输入文字颜色
-            unfocusedTextColor = Color.Black,         // 未聚焦时文字颜色
-            //focusedContainerColor = Color.White,     // 聚焦时背景色
-            focusedBorderColor = Color(0xffE5E7EB),  // 聚焦时边框颜色
-            unfocusedBorderColor = Color(0xffE5E7EB), // 未聚焦时边框颜色
-        ),
-    )
+    OutlinedInput(str = textState.value,onValueChange = {textState.value=it}, paddingValues = PaddingValues(top = 30.dp, start = 10.dp, end = 10.dp),
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.AccountCircle,
+                contentDescription = "Email icon",
+                tint = Color(0xff9CA3AF)
+            )
+        })
+    OutlinedInput(str = textState.value,onValueChange = {textState.value=it}, paddingValues = PaddingValues(top = 30.dp, start = 10.dp, end = 10.dp),
+        leadingIcon = {
+            Icon(
+                imageVector = Icons.Default.Lock,
+                contentDescription = "Email icon",
+                tint = Color(0xff9CA3AF)
+            )
+        })
+    Button(onClick = {}, shape = RoundedCornerShape(8.dp), modifier = Modifier.padding(top = 60.dp, start = 5.dp, end = 5.dp)
+        .fillMaxWidth(),
+        colors = ButtonDefaults.buttonColors(Color(0xff1677FF))
+    ) {
+        Text("登录", color = Color.White, modifier = Modifier.padding(vertical = 5.dp), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+    }
 }
 
 @Composable
 fun OutlinedInput(
     str: String,
     onValueChange: (String) -> Unit  // ✅ 回调函数，用于更新父组件的状态
-    ,paddingValues: PaddingValues,
-
+    , paddingValues: PaddingValues= PaddingValues(0.dp),
+    leadingIcon:  @Composable() (() -> Unit)? = null
 ) {
     OutlinedTextField(
         value = str,
@@ -512,7 +526,7 @@ fun OutlinedInput(
             .padding(paddingValues)
             .fillMaxWidth(),
         shape = RoundedCornerShape(12.dp),
-        leadingIcon = ,
+        leadingIcon = leadingIcon,
         colors = OutlinedTextFieldDefaults.colors(
             focusedTextColor = Color.Black,          // 输入文字颜色
             unfocusedTextColor = Color.Black,         // 未聚焦时文字颜色
