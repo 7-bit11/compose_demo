@@ -61,7 +61,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material3.InputChip
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.runtime.MutableState
@@ -146,12 +149,13 @@ class MainActivity : ComponentActivity() {
             MyApplicationTheme {
 
                 Scaffold(modifier = Modifier.fillMaxSize(),
+                    containerColor = Color(0xffFFFFFF),
                     topBar = {
                         //Appbar(title = "设备详情")
                     },
                     content = { innerPadding ->
                         ScrollColumn(
-                            innerPadding, backgroundColor = MaterialTheme.colorScheme.background,
+                            innerPadding, backgroundColor = Color(0xffFFFFFF),
                             horizontal = 20.dp
                         ) {
                             login()
@@ -447,15 +451,77 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun login() {
-    Row(modifier = Modifier.fillMaxWidth()) {
+    val textState = remember { mutableStateOf("210014468@qq.com") }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 40.dp)
+    ) {
         Text(
             "登录XXX",
             fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.W600
         )
     }
+    Image(
+        painter = painterResource(id = R.drawable.logo),
+        contentDescription = "登录logo",
+        modifier = Modifier
+            .width(120.dp)
+            .padding(top = 40.dp, bottom = 30.dp)
+    )
+    Text(
+        text = "欢迎登录XXX云，开启您的体验之旅",
+        color = Color(0xff374151),
+        fontSize = 18.sp,
+        fontWeight = FontWeight.Bold
+    )
+
+    OutlinedTextField(
+        value = textState.value,
+        onValueChange = { textState.value = it },
+        //label = { Text("密码") },
+        placeholder = { Text("") },
+        modifier = Modifier
+            .padding(horizontal = 20.dp, vertical = 30.dp)
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = Color.Black,          // 输入文字颜色
+            unfocusedTextColor = Color.Black,         // 未聚焦时文字颜色
+            //focusedContainerColor = Color.White,     // 聚焦时背景色
+            focusedBorderColor = Color(0xffE5E7EB),  // 聚焦时边框颜色
+            unfocusedBorderColor = Color(0xffE5E7EB), // 未聚焦时边框颜色
+        ),
+    )
 }
 
+@Composable
+fun OutlinedInput(
+    str: String,
+    onValueChange: (String) -> Unit  // ✅ 回调函数，用于更新父组件的状态
+    ,paddingValues: PaddingValues,
+
+) {
+    OutlinedTextField(
+        value = str,
+        onValueChange = onValueChange,
+        //label = { Text("密码") },
+        placeholder = { Text("") },
+        modifier = Modifier
+            .padding(paddingValues)
+            .fillMaxWidth(),
+        shape = RoundedCornerShape(12.dp),
+        leadingIcon = ,
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedTextColor = Color.Black,          // 输入文字颜色
+            unfocusedTextColor = Color.Black,         // 未聚焦时文字颜色
+            //focusedContainerColor = Color.White,     // 聚焦时背景色
+            focusedBorderColor = Color(0xffE5E7EB),  // 聚焦时边框颜色
+            unfocusedBorderColor = Color(0xffE5E7EB), // 未聚焦时边框颜色
+        ),
+    )
+}
 
 @Composable
 fun CardSwitch(
